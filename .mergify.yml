@@ -1,0 +1,15 @@
+queue_rules:
+  - name: default
+    merge_conditions:
+      - check-success=CI
+    batch_size: 3
+    batch_max_wait_time: 60s
+
+pull_request_rules:
+  - name: Automatic merge when CI passes and approved
+    conditions:
+      - check-success=CI
+      - "#approved-reviews-by>=1"
+    actions:
+      queue:
+        name: default

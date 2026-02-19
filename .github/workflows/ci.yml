@@ -1,0 +1,52 @@
+name: CI
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run tests
+        run: |
+          echo "Running tests..."
+          bash run_tests.sh
+
+      - name: Check token permissions
+        run: |
+          echo "=== GITHUB_TOKEN Permissions ==="
+          curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            https://api.github.com/repos/${{ github.repository }} \
+            -I 2>&1 | grep -i "x-oauth-scopes\|x-accepted-oauth-scopes"
+
+          echo "=== Event name ==="
+          echo "${{ github.event_name }}"
+
+          echo "=== PR head ref ==="
+          echo "${{ github.head_ref }}"
+
+          echo "=== PR head repo full name ==="
+          echo "${{ github.event.pull_request.head.repo.full_name }}"
+
+          echo "=== Is fork? ==="
+          echo "${{ github.event.pull_request.head.repo.fork }}"
+
+          echo "=== Actor ==="
+          echo "${{ github.actor }}"
+
+          echo "=== Ref ==="
+          echo "${{ github.ref }}"
+
+      - name: Check secret access
+        env:
+          TEST_SECRET: ${{ secrets.TEST_SECRET }}
+        run: |
+          if [ -n "$TEST_SECRET" ]; then
+            echo "SECRET_ACCESSIBLE=true"
+            echo "Secret length: ${#TEST_SECRET}"
+          else
+            echo "SECRET_ACCESSIBLE=false"
+          fi
