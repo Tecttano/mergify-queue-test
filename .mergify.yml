@@ -1,17 +1,8 @@
-queue_rules:
-  - name: default
-    queue_conditions:
-      - check-success = test
-    merge_conditions:
-      - check-success = test
-    batch_size: 3
-    batch_max_wait_time: 60s
-
 pull_request_rules:
-  - name: Automatic merge when CI passes and approved
+  - name: Label approved PRs
     conditions:
-      - check-success = test
       - "#approved-reviews-by >= 1"
     actions:
-      queue:
-        name: default
+      label:
+        add:
+          - approved
